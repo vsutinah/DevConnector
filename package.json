@@ -1,0 +1,28 @@
+{
+  "name": "devconnector",
+  "version": "1.0.0",
+  "description": "MERN stack sample app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server", 
+    "server": "nodemon server"
+  },
+  "author": "Vincent Sutinah",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.3",
+    "express": "^4.17.1",
+    "express-validator": "^6.8.0",
+    "gravatar": "^1.8.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.11.8",
+    "react": "^17.0.1",
+    "redux": "^4.0.5",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.6"
+  }
+}
