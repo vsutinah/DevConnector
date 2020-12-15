@@ -4,8 +4,8 @@
   "description": "MERN stack sample app",
   "main": "app.js",
   "scripts": {
-    "start": "node server", 
-    "server": "nodemon server"
+    "start": "node app", 
+    "server": "nodemon app"
   },
   "author": "Vincent Sutinah",
   "license": "ISC",
