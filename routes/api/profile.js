@@ -2,7 +2,7 @@ const express = require('express'),
     router = express.Router(),
     axios = require('axios'),
     config = require('config'),
-    auth = require('../middleware/auth'),
+    auth = require('../../middleware/auth'),
     { check, validationResult } = require('express-validator'),
     Profile = require('../../models/Profile'),
     User = require('../../models/User');
@@ -127,7 +127,7 @@ router.get('/user/:user_id', async (req, res) => {
         res.json(profile);
     } catch (e) {
         console.error(e.message);
-        if (err.kind == 'ObjectId') return res.status(400).json({ msg: 'There is no profile for this user' }); // Error if no profile found
+        if (err.kind === 'ObjectId') return res.status(400).json({ msg: 'There is no profile for this user' }); // Error if no profile found
         res.status(500).send('Server Error'); 
     }
 })

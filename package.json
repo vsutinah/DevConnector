@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app",
-    "server": "nodemon app"
+    "server": "nodemon app",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Vincent Sutinah",
   "license": "ISC",
@@ -13,6 +15,7 @@
     "axios": "^0.21.0",
     "bcryptjs": "^2.4.3",
     "config": "^3.3.3",
+    "create-react-app": "^4.0.1",
     "express": "^4.17.1",
     "express-validator": "^6.8.0",
     "gravatar": "^1.8.1",
