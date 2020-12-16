@@ -15,14 +15,14 @@ router.get('/', auth, async (req, res) => {
         const user = await User.findById(req.user.id); // Remember that we set req.user as our user in auth middleware  
         res.json(user); // Return our user details in JSON format
     } catch(e) {
-        console.log(e.message);
+        console.error(e.message);
         res.status(500).send('Server error');
     }
 }); 
 
 // @route   POST api/auth
 // @desc    Login user w/ JWT token
-// @access  Private
+// @access  Public
 router.post('/', [
     // Middleware that validates req body content
     check('email', 'Please include valid email').isEmail(),
@@ -72,7 +72,7 @@ router.post('/', [
         // We will use the JWT's ID to access protected routes (auth)
         
     } catch (e) {
-        console.log(e.message);
+        console.error(e.message);
         return res.status(500).send('Server Error');
     }
 
