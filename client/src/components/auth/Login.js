@@ -9,8 +9,10 @@ const Login = () => {
     }); 
 
     const { email, password } = formData;
+    // Event handlers
+    // onChange event handler that dynamically changes form data with our input?
     const onChange = e => setFormData({...formData, [e.target.name]: e.target.value});
-
+    // onSubmit event handler that prevents event bubbling?
     const onSubmit = async e => {
         e.preventDefault();
         console.log('Success');
@@ -29,14 +31,14 @@ const Login = () => {
             placeholder="Password"
             name="password"
             minLength="6"
-            value={password} 
+            value={password} // E.g of a prop 
             onChange={e => onChange(e)}
           />
         </div>
         <input type="submit" className="btn btn-primary" value="Login" />
       </form>
       <p className="my-1">
-        Don't have an account? <Link to="/login">Sign Up</Link>
+        Don't have an account? <Link to="/register">Sign Up</Link>
       </p>
         </Fragment>
     )
