@@ -1,7 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react';
+import PropTypes from 'prop-types';
+import { login } from '../../actions/auth';
 
-const Login = () => {
+// Pass in login action (from props) as argument
+const Login = ({ login }) => {
     const [formData, setFormData] = useState({
         // Initial states 
         email: '',
@@ -15,7 +19,7 @@ const Login = () => {
     // onSubmit event handler that prevents event bubbling?
     const onSubmit = async e => {
         e.preventDefault();
-        console.log('Success');
+        login(email, password); // Call login action for user login
     }
 
     return (<Fragment>
@@ -44,5 +48,13 @@ const Login = () => {
     )
 }
 
-export default Login
+Login.propTypes = {
+  login: PropTypes.func.isRequired,
+}
+
+// Connect component to our login action
+export default connect(
+  null, 
+  { login })
+  (Login);
 

@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import rootReducer from './reducers';
 // Initialize object to store all initial states for store
 const initialState = {};
-
+// The middleware for our store
 const middleware = [thunk];
 // Create store for Redux
 const store = createStore(
