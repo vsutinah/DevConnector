@@ -3,9 +3,11 @@ const express = require('express'),
     axios = require('axios'),
     config = require('config'),
     auth = require('../../middleware/auth'),
+    normalize = require('normalize-url'),
     { check, validationResult } = require('express-validator'),
     Profile = require('../../models/Profile'),
-    User = require('../../models/User');
+    User = require('../../models/User'),
+    Post = require('../../models/Post');
 
 // @route   GET api/profile/me
 // @desc    Get current user's profile
@@ -30,77 +32,68 @@ router.get('/me', auth, async (req, res) => {
 // @route   POST api/profile
 // @desc    Create/update profile 
 // @access  Private
-router.post('/', [ auth, [
-    check('status', 'Status is required')
-        .not()
-        .isEmpty(),
-    check('skills', 'Skills is required')
-        .not()
-        .isEmpty()
-    ]
-], 
+router.post(
+    '/',
+    auth,
+    check('status', 'Status is required').not().isEmpty(),
+    check('skills', 'Skills is required').not().isEmpty(),
     async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json( { errors: errors.array() })
-        }
-        // Destructure the fields from req.body
-        const {
-            company,
-            website,
-            location,
-            bio,
-            status,
-            githubusername,
-            skills,
-            youtube,
-            facebook,
-            twitter,
-            instagram,
-            linkedin
-        } = req.body;
-        // Build profile object
-        const profileFields = {};
-        profileFields.user = req.user.id;
-        if(company) profileFields.company = company;
-        if(website) profileFields.website = website;
-        if(location) profileFields.location = location;
-        if(bio) profileFields.bio = bio;
-        if(status) profileFields.status = status;
-        if(githubusername) profileFields.githubusername = githubusername;
-        if(skills) {
-            profileFields.skills = skills.split(',').map(skill => skill.trim()); // Split the string by its delimiter
-        }
-
-        // Build social object
-        profileFields.social = {};
-        if (youtube) profileFields.social.youtube = youtube;
-        if (twitter) profileFields.social.twitter = twitter;
-        if (facebook) profileFields.social.facebook = facebook;
-        if (linkedin) profileFields.social.linkedin = linkedin;
-        if (instagram) profileFields.social.instagram = instagram;
-
-        try {
-            let profile = await Profile.findOne({ user: req.user.id }); // Find profile with ID of current user (req.user)
-            if (profile) {
-                // Update profile
-                profile = await Profile.findOneAndUpdate(
-                    { user: req.user.id }, 
-                    { $set: profileFields },
-                    { new: true }); // Update profile to be filled with profileFields input
-                
-                return res.json(profile);
-            };
-            // Create new profile for user if user doesn't have one 
-            profile = new Profile(profileFields);
-            await profile.save();
-            res.json(profile);
-
-        } catch (e) {
-            console.error(e.message);
-            res.status(500).send('Server Error');
-        }
-    })
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+   
+      // destructure the request
+      const {
+        website,
+        skills,
+        youtube,
+        twitter,
+        instagram,
+        linkedin,
+        facebook,
+        // spread the rest of the fields we don't need to check
+        ...rest
+      } = req.body;
+   
+      // build a profile
+      const profileFields = {
+        user: req.user.id,
+        website:
+          website && website !== ''
+            ? normalize(website, { forceHttps: true })
+            : '',
+        skills: Array.isArray(skills)
+          ? skills
+          : skills.split(',').map((skill) => ' ' + skill.trim()),
+        ...rest
+      };
+   
+      // Build socialFields object
+      const socialFields = { youtube, twitter, instagram, linkedin, facebook };
+   
+      // normalize social fields to ensure valid url
+      for (const [key, value] of Object.entries(socialFields)) {
+        if (value && value.length > 0)
+          socialFields[key] = normalize(value, { forceHttps: true });
+      }
+      // add to profileFields
+      profileFields.social = socialFields;
+   
+      try {
+        // Using upsert option (creates new doc if no match is found):
+        let profile = await Profile.findOneAndUpdate(
+          { user: req.user.id },
+          { $set: profileFields },
+          { new: true, upsert: true, setDefaultsOnInsert: true }
+        );
+        return res.json(profile);
+      } catch (err) {
+        console.error(err.message);
+        return res.status(500).send('Server Error');
+      }
+    }
+  );
 
 // @route   GET api/profile
 // @desc    Get all profiles
@@ -137,8 +130,8 @@ router.get('/user/:user_id', async (req, res) => {
 // @access  Private
 router.delete('/', auth, async (req, res) => {
     try {
-        // @todo - remove users posts
-
+        // Remove users posts
+        await Post.deleteMany({ user: req.user.id });
         // Remove the profile
         await Profile.findOneAndRemove( {user: req.user.id } );
         await User.findOneAndRemove({ _id: req.user.id });
