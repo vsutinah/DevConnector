@@ -41,7 +41,7 @@ const EditProfile = ({ profile: { profile, loading }, createProfile, getCurrentP
             youtube: loading || !profile.social ? '' : profile.social.youtube,
             instagram: loading || !profile.social ? '' : profile.social.instagram,
         })
-    }, [loading]) // Run useEffect only when page is loading
+    }, [loading, getCurrentProfile]) // Run useEffect only when page is loading
 
     // State to display social inputs/form fields
     const [ displaySocialInputs, toggleSocialInputs ] = useState(false);
@@ -190,7 +190,6 @@ EditProfile.propTypes = {
     profile: PropTypes.object.isRequired
 }
 
-{/* Bring in profile state as props to EditProfile through mapStateToProps */}
 const mapStateToProps = state => ({
     profile: state.profile
 })

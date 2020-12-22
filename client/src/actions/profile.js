@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { setAlert } from './alert';
-import { CLEAR_PROFILE, GET_PROFILE, PROFILE_ERROR, UPDATE_PROFILE, ACCOUNT_DELETED } from './types';
+import { CLEAR_PROFILE, GET_PROFILE, GET_PROFILES, GET_REPOS, PROFILE_ERROR, UPDATE_PROFILE, ACCOUNT_DELETED } from './types';
 
 // Get current users profile
 export const getCurrentProfile = () => async dispatch => {
+
     try {
         const res = await axios.get('/api/profile/me'); // Load profile using user ID in token
         
@@ -11,6 +12,66 @@ export const getCurrentProfile = () => async dispatch => {
             type: GET_PROFILE,
             payload: res.data // Contains profile data
         })
+    } catch (e) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { msg: e.response.statusText, status: e.response.status }
+        })
+    }
+}
+
+// Get all profiles
+export const getProfiles = () => async dispatch => {
+    
+    // Clear current profile states
+    dispatch({ type: CLEAR_PROFILE });
+    
+    try {
+        const res = await axios.get('/api/profile'); // Load all profiles
+        
+        dispatch({
+            type: GET_PROFILES,
+            payload: res.data // Contains all profiles in DB
+        })
+
+    } catch (e) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { msg: e.response.statusText, status: e.response.status }
+        })
+    }
+}
+
+// Get profile by ID
+export const getProfileById = userId => async dispatch => {
+    
+    try {
+        const res = await axios.get(`/api/profile/user/${userId}`); // Load all profiles
+        
+        dispatch({
+            type: GET_PROFILE,
+            payload: res.data // Contains profile data with id 'userId'
+        })
+        
+    } catch (e) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { msg: e.response.statusText, status: e.response.status }
+        })
+    }
+}
+
+// Get Github repos
+export const getGithubRepos = username => async dispatch => {
+    
+    try {
+        const res = await axios.get(`/api/profile/github/${username}`); // Load all profiles
+        
+        dispatch({
+            type: GET_REPOS,
+            payload: res.data // Contains github repos belong to username 'username'
+        })
+        
     } catch (e) {
         dispatch({
             type: PROFILE_ERROR,
@@ -192,7 +253,7 @@ export const deleteAccount = () => async dispatch => {
     if (window.confirm('Are you sure you want to delete your account?')) {
         try {
             // Send DELETE request to api/profile
-            const res = await axios.delete('api/profile')
+            await axios.delete('api/profile')
             
             // Dispatch CLEAR_PROFILE action to delete profile
             dispatch({

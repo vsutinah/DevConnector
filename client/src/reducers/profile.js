@@ -1,4 +1,4 @@
-import { CLEAR_PROFILE, UPDATE_PROFILE, GET_PROFILE, PROFILE_ERROR } from '../actions/types';
+import { CLEAR_PROFILE, UPDATE_PROFILE, GET_PROFILE, GET_PROFILES, PROFILE_ERROR, GET_REPOS } from '../actions/types';
 // Initial state for Profile component
 const initialState = {
     profile: null, // Will store profile data of currently logged in user, or queried user's profile
@@ -19,6 +19,20 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 profile: payload,
+                loading: false
+            }
+        case GET_PROFILES:
+            // Return current state + list of all profiles in payload
+            return {
+                ...state,
+                profiles: payload,
+                loading: false
+            }
+        case GET_REPOS:
+            // Return current state + all repos in the payload
+            return {
+                ...state,
+                repos: payload,
                 loading: false
             }
         case PROFILE_ERROR:
