@@ -13,6 +13,8 @@ export const getCurrentProfile = () => async dispatch => {
             payload: res.data // Contains profile data
         })
     } catch (e) {
+        dispatch({ type: CLEAR_PROFILE })
+
         dispatch({
             type: PROFILE_ERROR,
             payload: { msg: e.response.statusText, status: e.response.status }
