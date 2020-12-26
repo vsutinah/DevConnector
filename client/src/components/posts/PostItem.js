@@ -5,7 +5,7 @@ import formatDate from '../../utils/formatDate';
 import { connect } from 'react-redux';
 import { addLike, removeLike } from '../../actions/post';
 
-const PostItem = ({ auth, post: { _id, text, name, avatar, user, likes, comments, date }}) => {
+const PostItem = ({ addLike, removeLike, auth, post: { _id, text, name, avatar, user, likes, comments, date }}) => {
     return (
         <div className="post bg-white p-1 my-1">
           <div>
