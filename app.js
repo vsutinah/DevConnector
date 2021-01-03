@@ -1,6 +1,7 @@
 const express = require('express'),
-    connectDB = require('./config/db')
-    app = express();
+    connectDB = require('./config/db'),
+    app = express(),
+    path = require('path');
 
 const port = process.env.PORT || 5000;
 
@@ -16,9 +17,15 @@ app.use('/api/auth', require('./routes/api/auth'));
 app.use('/api/posts', require('./routes/api/posts'));
 app.use('/api/profile', require('./routes/api/profile'));
 
-app.get('/', (req, res) => {
-    res.send('API RUNNING');
-})
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+    // Set static folder
+    app.use(express.static('client/build'));
+    // Serve index page
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+}
 
 app.listen(port, () => console.log(`Server started on ${port}`))
 
